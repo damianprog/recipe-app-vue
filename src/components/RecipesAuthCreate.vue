@@ -63,18 +63,28 @@
             }
         },
 
+        computed: {
+            arePasswordsEqual() {
+                return this.password === this.repeatPassword;
+            }
+        },
+
         methods: {
             login() {
                 this.$emit("login");
             },
             register(e) {
-                firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
-                    .then(response => {
-                            this.$router.replace("home");
-                        },
-                        err => {
-                            alert(err.message);
-                        });
+                if (this.arePasswordsEqual) {
+                    firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+                        .then(response => {
+                                this.$router.replace("home");
+                            },
+                            err => {
+                                alert(err.message);
+                            });
+                } else {
+                    alert("Provided passwords are not matching");
+                }
 
                 e.preventDefault();
             }

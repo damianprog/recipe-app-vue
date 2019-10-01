@@ -12,9 +12,11 @@
         <v-dialog
                 v-model="viewDialog"
                 width="800px"
+                persistent
         >
             <recipes-panel-cards-recipe-view
                 :recipe="recipeToShow"
+                @close="onCloseRecipe"
             >
             </recipes-panel-cards-recipe-view>
         </v-dialog>
@@ -49,6 +51,11 @@
             onOpenRecipe(recipe) {
                 this.recipeToShow = recipe;
                 this.viewDialog = true;
+            },
+
+            onCloseRecipe() {
+                this.viewDialog = false;
+                this.recipeToShow = {};
             }
         }
     }

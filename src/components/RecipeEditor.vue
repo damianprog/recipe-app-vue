@@ -29,7 +29,7 @@
                         cols="5"
                 >
                     <v-select
-                            v-model="updatedRecipe.mealType"
+                            v-model="updatedRecipe.mealTypes"
                             label="Meal Type"
                             :items="mealTypes"
                             multiple
