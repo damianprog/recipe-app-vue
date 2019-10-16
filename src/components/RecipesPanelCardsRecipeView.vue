@@ -9,25 +9,55 @@
                     >
                     </v-text-field>
                 </div>
-                <div v-else>
+                <div class="pb-3" v-else>
                     {{updatedRecipe.title}}
                 </div>
-                <v-subheader class="pl-0">
-                    <div class="pr-2">
-                        Difficulty: {{updatedRecipe.difficulty}}
-                    </div>
-                    <div class="pr-2">
-                        Meal Types:&nbsp; {{mealTypes}}
-                    </div>
-                    <div>
-                        For People: {{updatedRecipe.people}}
-                    </div>
+                <v-row v-if="editMode">
+                    <v-col cols="6" sm="3">
+                        <v-select
+                                v-model="updatedRecipe.difficulty"
+                                label="Difficulty"
+                                :items="difficultyLevels"
+                        >
+                        </v-select>
+                    </v-col>
+                    <v-col cols="6" sm="3">
+                        <v-text-field
+                                v-model.number="updatedRecipe.people"
+                                type="number"
+                                min="0"
+                                label="For People"
+                        >
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="5">
+                        <v-select
+                                v-model="updatedRecipe.mealTypes"
+                                label="Meal Type"
+                                :items="mealTypes"
+                                multiple
+                        >
+                        </v-select>
+                    </v-col>
+                </v-row>
+                <v-subheader v-else class="pl-3">
+                    <v-row>
+                        <div class="pr-2">
+                            Difficulty: {{updatedRecipe.difficulty}}
+                        </div>
+                        <div class="pr-2">
+                            For People: {{updatedRecipe.people}}
+                        </div>
+                        <div class="pr-2">
+                            Meal Types:&nbsp; {{formattedMealTypes}}
+                        </div>
+                    </v-row>
                 </v-subheader>
             </div>
         </v-card-title>
         <v-card-text class="text--primary">
             <v-row>
-                <v-col xs="12" sm="6">
+                <v-col cols="12" md="6" order="2" order-md="1">
                     <h3 class="mb-4">Ingredients</h3>
                     <v-textarea
                             v-if="editMode"
@@ -42,8 +72,12 @@
                     >
                     </div>
                 </v-col>
-                <v-col xs="12" sm="6">
-                    <v-img :src="updatedRecipe.imgUrl"></v-img>
+                <v-col cols="12" md="6" order="1" order-md="2">
+                    <img
+                            class="recipeImg"
+                            :src="updatedRecipe.imgUrl"
+                            @error="imgUrlAlt"
+                    />
                     <div v-if="editMode">
                         <v-text-field
                                 outlined
@@ -73,20 +107,40 @@
             </v-row>
         </v-card-text>
         <v-card-actions>
-            <v-spacer></v-spacer>
+            <template v-if="isPreviewMode">
+                <v-spacer></v-spacer>
+                <v-btn
+                        @click="saveRecipe"
+                        class="mr-2"
+                        color="success"
+                >
+                    Save Recipe
+                </v-btn>
+            </template>
+            <template v-else>
+                <v-btn
+                        @click="deleteRecipe"
+                        dark
+                        color="error"
+                        class="ml-2"
+                >
+                    Delete
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn
+                        @click="changeMode"
+                        class="mr-2"
+                        color="success"
+                >
+                    {{modeBtnLabel}}
+                </v-btn>
+            </template>
             <v-btn
                     @click="close"
                     dark
                     color="#1e88e5"
             >
                 Close
-            </v-btn>
-            <v-btn
-                    @click="changeMode"
-                    class="mr-2"
-                    color="success"
-            >
-                {{currentMode}}
             </v-btn>
         </v-card-actions>
     </v-card>
@@ -108,16 +162,21 @@
         data() {
             return {
                 editMode: false,
-                updatedRecipe: {...this.recipe}
+                updatedRecipe: {...this.recipe},
+                mealTypes: ["Breakfast", "Lunch", "Supper", "Snack"],
+                difficultyLevels: ["Beginner", "Intermediate", "Advanced"]
             }
         },
 
         computed: {
-            currentMode() {
+            modeBtnLabel() {
                 return this.editMode ? "View Mode" : "Edit Mode";
             },
-            mealTypes() {
+            formattedMealTypes() {
                 return this.updatedRecipe.mealTypes ? this.updatedRecipe.mealTypes.join(", ") : "";
+            },
+            isPreviewMode() {
+               return !this.updatedRecipe.id;
             }
         },
 
@@ -130,21 +189,41 @@
                 this.$emit("close");
             },
             changeMode() {
-              if (this.editMode) {
-                  this.updateRecipe();
-              }
+                if (this.editMode) {
+                    this.updateRecipe();
+                }
 
-              this.editMode = !this.editMode;
+                this.editMode = !this.editMode;
+            },
+            saveRecipe() {
+                const {id, ...recipe} = this.updatedRecipe;
+                db.collection('recipes').add(recipe)
+                    .then(docRef => {
+                        this.updatedRecipe.id = docRef.id;
+                    })
+                    .catch(err => console.log(err));
             },
             updateRecipe() {
                 db.collection('recipes').doc(this.recipe.id).get().then(doc => {
                     const {id, ...recipeToSave} = this.updatedRecipe;
                     doc.ref.update({...recipeToSave});
                 })
-                .then(() => {
-                    alert("Recipe Updated.")
-                });
-
+                    .then(() => {
+                        this.$emit("update");
+                    });
+            },
+            deleteRecipe() {
+                if (confirm("Are you sure you want to delete this recipe?")) {
+                    db.collection('recipes').doc(this.recipe.id).get().then(doc => {
+                        doc.ref.delete();
+                    })
+                        .then(() => {
+                            this.$emit("delete");
+                        });
+                }
+            },
+            imgUrlAlt(event) {
+                event.target.src = require("@/assets/recipe-img.png");
             }
         },
 
@@ -157,5 +236,8 @@
 </script>
 
 <style scoped>
-
+    .recipeImg {
+        object-fit: cover;
+        width: 100%;
+    }
 </style>

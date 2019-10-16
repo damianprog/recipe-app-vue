@@ -1,7 +1,7 @@
 <template>
     <v-container>
-        <v-row>
-            <v-col xs="12" sm="4" v-for="recipe in recipes">
+        <v-row align="stretch">
+            <v-col cols="12" sm="6" md="4" xl="3" v-for="recipe in recipes">
                 <recipes-panel-cards-recipe
                         :recipe="recipe"
                         @openRecipe="onOpenRecipe($event)"
@@ -17,6 +17,8 @@
             <recipes-panel-cards-recipe-view
                 :recipe="recipeToShow"
                 @close="onCloseRecipe"
+                @update="$emit('refetchRecipes')"
+                @delete="onDeleteRecipe"
             >
             </recipes-panel-cards-recipe-view>
         </v-dialog>
@@ -56,6 +58,11 @@
             onCloseRecipe() {
                 this.viewDialog = false;
                 this.recipeToShow = {};
+            },
+
+            onDeleteRecipe() {
+                this.onCloseRecipe();
+                this.$emit("refetchRecipes");
             }
         }
     }

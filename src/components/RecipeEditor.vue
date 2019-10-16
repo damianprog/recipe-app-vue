@@ -6,16 +6,18 @@
         <v-card-text>
             <v-row>
                 <v-col
-                    cols="6"
+                        cols="12"
+                        sm="6"
                 >
                     <v-text-field
-                        v-model="updatedRecipe.title"
-                        label="Title"
+                            v-model="updatedRecipe.title"
+                            label="Title"
                     >
                     </v-text-field>
                 </v-col>
                 <v-col
-                        cols="6"
+                        cols="12"
+                        sm="6"
                 >
                     <v-text-field
                             v-model="updatedRecipe.imgUrl"
@@ -26,7 +28,8 @@
             </v-row>
             <v-row>
                 <v-col
-                        cols="5"
+                        cols="12"
+                        sm="5"
                 >
                     <v-select
                             v-model="updatedRecipe.mealTypes"
@@ -37,32 +40,33 @@
                     </v-select>
                 </v-col>
                 <v-col
-                        cols="5"
+                        cols="6"
+                        sm="5"
                 >
                     <v-select
                             v-model="updatedRecipe.difficulty"
-                            label="Difficulty Level"
+                            label="Difficulty"
                             :items="difficultyLevels"
-                            multiple
                     >
                     </v-select>
                 </v-col>
                 <v-col
-                        cols="2"
+                        cols="6"
+                        sm="2"
                 >
                     <v-text-field
-                        v-model.number="updatedRecipe.people"
-                        type="number"
-                        min="0"
-                        label="For People"
+                            v-model.number="updatedRecipe.people"
+                            type="number"
+                            min="0"
+                            label="For People"
                     >
                     </v-text-field>
                 </v-col>
             </v-row>
             <v-textarea
-                v-model="updatedRecipe.ingredients"
-                rows="12"
-                label="Ingredients"
+                    v-model="updatedRecipe.ingredients"
+                    rows="12"
+                    label="Ingredients"
             >
             </v-textarea>
             <v-textarea
@@ -75,12 +79,17 @@
         <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-                @click="closeEditor"
-            >Close</v-btn>
+                    @click="closeEditor"
+                    dark
+                    color="#1e88e5"
+            >Close
+            </v-btn>
             <v-btn
-                class="mr-4"
-                @click="save"
-            >Save</v-btn>
+                    class="mr-4"
+                    @click="save"
+                    color="success"
+            >Save
+            </v-btn>
         </v-card-actions>
     </v-card>
 </template>
@@ -92,19 +101,19 @@
         name: "RecipeEditor",
 
         props: {
-          recipe: {
-              type: Object,
-              default: () => {
-                  return {}
-              }
-          }
+            recipe: {
+                type: Object,
+                default: () => {
+                    return {}
+                }
+            }
         },
 
         data() {
             return {
                 updatedRecipe: {...this.recipe},
-                mealTypes: ["Breakfast","Lunch","Supper","Snack"],
-                difficultyLevels: ["Beginner","Intermediate","Advanced"]
+                mealTypes: ["Breakfast", "Lunch", "Supper", "Snack"],
+                difficultyLevels: ["Beginner", "Intermediate", "Advanced"]
             }
         },
 
@@ -119,7 +128,7 @@
                 this.updatedRecipe = {};
                 this.$emit("close");
             },
-            save () {
+            save() {
                 const {id, ...recipe} = this.updatedRecipe;
                 db.collection('recipes').add(recipe)
                     .then(docRef => {
