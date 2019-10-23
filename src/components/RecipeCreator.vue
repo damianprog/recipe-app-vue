@@ -2,7 +2,7 @@
     <v-card
             max-width="1000"
     >
-        <v-card-title>{{editorTitle}}</v-card-title>
+        <v-card-title>Create Recipe</v-card-title>
         <v-card-text>
             <v-row>
                 <v-col
@@ -79,16 +79,18 @@
         <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-                    @click="closeEditor"
+                    @click="save"
+                    class="mr-2"
+                    color="success"
+                    :disabled="!enableSave"
+            >Save
+            </v-btn>
+            <v-btn
+                    @click="closeCreator"
+                    class="mr-4"
                     dark
                     color="#1e88e5"
             >Close
-            </v-btn>
-            <v-btn
-                    class="mr-4"
-                    @click="save"
-                    color="success"
-            >Save
             </v-btn>
         </v-card-actions>
     </v-card>
@@ -98,38 +100,30 @@
     import db from '../components/firebase/firebaseInit';
 
     export default {
-        name: "RecipeEditor",
-
-        props: {
-            recipe: {
-                type: Object,
-                default: () => {
-                    return {}
-                }
-            }
-        },
+        name: "RecipeCreator",
 
         data() {
             return {
-                updatedRecipe: {...this.recipe},
+                updatedRecipe: {},
                 mealTypes: ["Breakfast", "Lunch", "Supper", "Snack"],
                 difficultyLevels: ["Beginner", "Intermediate", "Advanced"]
             }
         },
 
         computed: {
-            editorTitle() {
-                return this.recipe.id ? this.recipe.title : "New Recipe";
+            enableSave() {
+                return this.updatedRecipe.title && this.updatedRecipe.title.trim() != "";
             }
         },
 
         methods: {
-            closeEditor() {
+            closeCreator() {
                 this.updatedRecipe = {};
                 this.$emit("close");
             },
             save() {
                 const {id, ...recipe} = this.updatedRecipe;
+                recipe.createdAt = new Date().toISOString();
                 db.collection('recipes').add(recipe)
                     .then(docRef => {
                         this.$emit("save");
@@ -138,12 +132,6 @@
                     .catch(err => console.log(err));
             }
         },
-
-        watch: {
-            recipe(data) {
-                this.updatedRecipe = {...data}
-            }
-        }
     }
 </script>
 

@@ -1,5 +1,7 @@
 <template>
-    <v-card>
+    <v-card
+        height=""
+    >
         <v-card-title>
             <div class="d-flex flex-column flex-grow-1">
                 Search for Recipe
@@ -55,7 +57,7 @@
             <recipes-panel-cards-recipe-view
                     :recipe="recipeToShow"
                     @close="onCloseRecipe"
-                    @update="$emit('refetchRecipes')"
+                    @save="$emit('refetchRecipes')"
                     @delete="onDeleteRecipe"
             >
             </recipes-panel-cards-recipe-view>
@@ -64,10 +66,11 @@
 </template>
 
 <script>
-    import RecipesPanelCardsRecipeView from "@/components/RecipesPanelCardsRecipeView";
+    import RecipesPanelCardsRecipeView from "@/components/panel/RecipesPanelCardsRecipeView";
+    import {MEAL_TYPES} from "@/constants";
 
     export default {
-        name: "SearchBox",
+        name: "SearchApiMenu",
 
         components: {
             RecipesPanelCardsRecipeView
@@ -93,7 +96,7 @@
                     recipe.title = m.strMeal;
                     recipe.instructions = m.strInstructions;
                     recipe.imgUrl = m.strMealThumb;
-                    recipe.mealTypes = [];
+                    recipe.mealTypes = MEAL_TYPES;
                     recipe.people = "";
                     recipe.difficulty = "";
                     recipe.ingredients = "";
@@ -104,7 +107,6 @@
                     }
                     return recipe;
                 }) : [];
-
             },
             onShowRecipe(recipe) {
                 this.recipeToShow = recipe;
@@ -121,6 +123,7 @@
             },
             closeSearchBox() {
                 this.searchPhrase = "";
+                this.results = [];
                 this.$emit("close");
             },
             imgUrlAlt(event) {

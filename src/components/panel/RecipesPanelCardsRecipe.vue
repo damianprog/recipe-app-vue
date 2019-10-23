@@ -2,8 +2,9 @@
     <v-card class="d-flex flex-column" height="100%">
         <img
                 class="recipeImg"
-                :src="recipe.imgUrl"
+                :src="defaultImg"
                 @error="imgUrlAlt"
+                ref="recipeImg"
         />
         <v-card-text
                 class="flex-grow-1 headline text--primary"
@@ -35,6 +36,12 @@
             }
         },
 
+        computed: {
+            defaultImg() {
+               return this.recipe.imgUrl ? this.recipe.imgUrl : require('@/assets/recipe-img.png');
+            }
+        },
+
         methods: {
             openRecipe() {
                 this.$emit('openRecipe', {...this.recipe});
@@ -42,7 +49,7 @@
             imgUrlAlt(event) {
                 event.target.src = require("@/assets/recipe-img.png");
             }
-        }
+        },
     }
 </script>
 

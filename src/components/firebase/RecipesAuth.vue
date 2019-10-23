@@ -29,8 +29,8 @@
 </template>
 
 <script>
-    import RecipesAuthLogin from "@/components/RecipesAuthLogin";
-    import RecipesAuthCreate from "@/components/RecipesAuthCreate";
+    import RecipesAuthLogin from "@/components/firebase/RecipesAuthLogin";
+    import RecipesAuthCreate from "@/components/firebase/RecipesAuthCreate";
 
     export default {
         name: 'RecipesAuth',

@@ -17,7 +17,7 @@
             <recipes-panel-cards-recipe-view
                 :recipe="recipeToShow"
                 @close="onCloseRecipe"
-                @update="$emit('refetchRecipes')"
+                @save="$emit('refetchRecipes')"
                 @delete="onDeleteRecipe"
             >
             </recipes-panel-cards-recipe-view>
@@ -26,8 +26,8 @@
 </template>
 
 <script>
-    import RecipesPanelCardsRecipe from "@/components/RecipesPanelCardsRecipe";
-    import RecipesPanelCardsRecipeView from "@/components/RecipesPanelCardsRecipeView";
+    import RecipesPanelCardsRecipe from "@/components/panel/RecipesPanelCardsRecipe";
+    import RecipesPanelCardsRecipeView from "@/components/panel/RecipesPanelCardsRecipeView";
 
     export default {
         name: "RecipesPanelCards",

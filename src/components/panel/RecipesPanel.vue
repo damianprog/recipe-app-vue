@@ -7,21 +7,24 @@
                 height="70px"
         >
             <v-row align="center" justify="space-around">
-                <v-col class="pa-0 ma-0" cols="6">
+                <v-col class="pa-0 ma-0" cols="4">
                     <v-col cols="auto">
                         <v-toolbar-title>Recipe Vue App</v-toolbar-title>
                     </v-col>
                 </v-col>
                 <v-col class="d-none d-md-flex" cols="auto">
+                    <filters-menu
+                            @filterInput="currentFilter = {...$event}"
+                    ></filters-menu>
                     <v-btn
                             color="success"
                             @click="searchDialog = true"
-                            class="mr-4"
-                    >Search Recipe
+                            class="ml-4 mr-4"
+                    >Search In Web
                     </v-btn>
                     <v-btn
                             color="#6a1b9a"
-                            @click="recipeEditorDialog = true"
+                            @click="recipeCreatorDialog = true"
                     >Create Recipe
                     </v-btn>
                 </v-col>
@@ -45,7 +48,7 @@
                                 <v-list-item-title>Search Recipe</v-list-item-title>
                             </v-list-item>
                             <v-list-item
-                                    @click="recipeEditorDialog = true"
+                                    @click="recipeCreatorDialog = true"
                             >
                                 <v-list-item-title>Create Recipe</v-list-item-title>
                             </v-list-item>
@@ -57,7 +60,7 @@
         <v-row justify="center">
             <v-col cols="11">
                 <recipes-panel-cards
-                        :recipes="recipes"
+                        :recipes="filteredSortedRecipes"
                         @refetchRecipes="fetchRecipes"
                 >
                 </recipes-panel-cards>
@@ -93,16 +96,16 @@
             </v-row>
         </v-footer>
         <v-dialog
-                v-model="recipeEditorDialog"
+                v-model="recipeCreatorDialog"
                 max-width="1000"
                 scrollable
                 persistent
         >
-            <recipe-editor
-                    @close="closeEditor"
+            <recipe-creator
+                    @close="closeCreator"
                     @save="onSave"
             >
-            </recipe-editor>
+            </recipe-creator>
         </v-dialog>
         <v-dialog
                 v-model="searchDialog"
@@ -120,10 +123,12 @@
 </template>
 
 <script>
-    import db from './firebase/firebaseInit';
-    import RecipeEditor from "@/components/RecipeEditor";
-    import RecipesPanelCards from "@/components/RecipesPanelCards";
-    import SearchBox from "@/components/SearchBox";
+    import db from '../firebase/firebaseInit';
+    import RecipeCreator from "@/components/RecipeCreator";
+    import RecipesPanelCards from "@/components/panel/RecipesPanelCards";
+    import FiltersMenu from "@/components/FiltersMenu";
+    import SearchBox from "@/components/SearchApiMenu";
+    import {MEAL_TYPES} from "@/constants";
 
     const firebase = require('firebase/app');
     require('firebase/auth');
@@ -131,22 +136,33 @@
     export default {
         name: "Recipes",
         components: {
-            RecipeEditor,
+            RecipeCreator,
             RecipesPanelCards,
+            FiltersMenu,
             SearchBox
         },
 
         data() {
             return {
-                recipeEditorDialog: false,
+                recipeCreatorDialog: false,
                 searchDialog: false,
                 recipes: [],
+                currentFilter: {title: "", mealTypes: MEAL_TYPES}
+            }
+        },
+
+        computed: {
+            filteredSortedRecipes() {
+                const filteredRecipes = this.recipes.filter(r => r.title.toLowerCase().includes(this.currentFilter.title)
+                    && r.mealTypes.some(mt => this.currentFilter.mealTypes.includes(mt)));
+
+                return filteredRecipes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             }
         },
 
         methods: {
-            closeEditor() {
-                this.recipeEditorDialog = false;
+            closeCreator() {
+                this.recipeCreatorDialog = false;
             },
             logout() {
                 firebase.auth().signOut().then(() => {
@@ -154,7 +170,7 @@
                 })
             },
             onSave() {
-                this.closeEditor();
+                this.closeCreator();
                 this.fetchRecipes();
             },
             fetchRecipes() {
@@ -167,9 +183,9 @@
                                 ...doc.data()
                             };
                             this.recipes.push({...data});
-                        })
+                        });
                     });
-            }
+            },
         },
 
         created() {

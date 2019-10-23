@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import RecipesAuth from '@/components/RecipesAuth'
-import RecipesPanel from '@/components/RecipesPanel'
+import RecipesAuth from '@/components/firebase/RecipesAuth'
+import RecipesPanel from '@/components/panel/RecipesPanel'
 import firebase from "firebase/app";
 
 Vue.use(Router);

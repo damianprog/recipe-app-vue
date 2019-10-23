@@ -40,7 +40,7 @@
                         </v-select>
                     </v-col>
                 </v-row>
-                <v-subheader v-else class="pl-3">
+                <v-subheader v-else-if="!isPreviewMode" class="pl-3">
                     <v-row>
                         <div class="pr-2">
                             Difficulty: {{updatedRecipe.difficulty}}
@@ -75,7 +75,7 @@
                 <v-col cols="12" md="6" order="1" order-md="2">
                     <img
                             class="recipeImg"
-                            :src="updatedRecipe.imgUrl"
+                            :src="defaultImg"
                             @error="imgUrlAlt"
                     />
                     <div v-if="editMode">
@@ -147,7 +147,7 @@
 </template>
 
 <script>
-    import db from '../components/firebase/firebaseInit';
+    import db from '../firebase/firebaseInit';
 
     export default {
         name: "RecipesPanelCardsRecipeView",
@@ -164,7 +164,7 @@
                 editMode: false,
                 updatedRecipe: {...this.recipe},
                 mealTypes: ["Breakfast", "Lunch", "Supper", "Snack"],
-                difficultyLevels: ["Beginner", "Intermediate", "Advanced"]
+                difficultyLevels: ["Beginner", "Intermediate", "Advanced"],
             }
         },
 
@@ -176,7 +176,10 @@
                 return this.updatedRecipe.mealTypes ? this.updatedRecipe.mealTypes.join(", ") : "";
             },
             isPreviewMode() {
-               return !this.updatedRecipe.id;
+                return !this.updatedRecipe.id;
+            },
+            defaultImg() {
+                return this.updatedRecipe.imgUrl ? this.updatedRecipe.imgUrl : require('@/assets/recipe-img.png');
             }
         },
 
@@ -197,27 +200,30 @@
             },
             saveRecipe() {
                 const {id, ...recipe} = this.updatedRecipe;
+                recipe.createdAt = new Date().toISOString();
                 db.collection('recipes').add(recipe)
                     .then(docRef => {
-                        this.updatedRecipe.id = docRef.id;
+                        this.$emit("save");
+                        this.updatedRecipe = {...this.updatedRecipe, id: docRef.id};
                     })
                     .catch(err => console.log(err));
             },
             updateRecipe() {
-                db.collection('recipes').doc(this.recipe.id).get().then(doc => {
+                db.collection('recipes').doc(this.updatedRecipe.id).get().then(doc => {
                     const {id, ...recipeToSave} = this.updatedRecipe;
                     doc.ref.update({...recipeToSave});
                 })
                     .then(() => {
-                        this.$emit("update");
+                        this.$emit("save");
                     });
             },
             deleteRecipe() {
                 if (confirm("Are you sure you want to delete this recipe?")) {
-                    db.collection('recipes').doc(this.recipe.id).get().then(doc => {
+                    db.collection('recipes').doc(this.updatedRecipe.id).get().then(doc => {
                         doc.ref.delete();
                     })
                         .then(() => {
+                            this.editMode = false;
                             this.$emit("delete");
                         });
                 }
