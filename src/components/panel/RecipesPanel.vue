@@ -7,15 +7,25 @@
                 height="70px"
         >
             <v-row align="center" justify="space-around">
-                <v-col class="pa-0 ma-0" cols="4">
+                <v-col class="pa-0 ma-0" cols="5">
                     <v-col cols="auto">
-                        <v-toolbar-title>Recipe Vue App</v-toolbar-title>
+                        <v-toolbar-title>My Recipes</v-toolbar-title>
                     </v-col>
                 </v-col>
                 <v-col class="d-none d-md-flex" cols="auto">
                     <filters-menu
                             @filterInput="currentFilter = {...$event}"
-                    ></filters-menu>
+                    >
+                        <div slot-scope="row">
+                            <v-btn
+                                    color="indigo"
+                                    dark
+                                    v-on="row.item"
+                            >
+                                Search Locally
+                            </v-btn>
+                        </div>
+                    </filters-menu>
                     <v-btn
                             color="success"
                             @click="searchDialog = true"
@@ -29,31 +39,52 @@
                     </v-btn>
                 </v-col>
                 <v-col class="d-md-none" cols="auto">
-                    <v-menu>
-                        <template v-slot:activator="{ on: menu }">
-                            <v-btn
-                                    color="#6a1b9a"
-                                    dark
-                                    fab
-                                    small
-                                    v-on="{...menu }"
+                    <v-row>
+                        <v-col cols="auto">
+                            <filters-menu
+                                    @filterInput="currentFilter = {...$event}"
                             >
-                                <v-icon>menu</v-icon>
-                            </v-btn>
-                        </template>
-                        <v-list>
-                            <v-list-item
-                                    @click="searchDialog = true"
-                            >
-                                <v-list-item-title>Search Recipe</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item
-                                    @click="recipeCreatorDialog = true"
-                            >
-                                <v-list-item-title>Create Recipe</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
+                                <div slot-scope="scope">
+                                    <v-btn
+                                            color="indigo"
+                                            dark
+                                            fab
+                                            small
+                                            v-on="scope.item"
+                                    >
+                                        <v-icon>search</v-icon>
+                                    </v-btn>
+                                </div>
+                            </filters-menu>
+                        </v-col>
+                        <v-col cols="auto">
+                            <v-menu>
+                                <template v-slot:activator="{ on: menu }">
+                                    <v-btn
+                                            color="#6a1b9a"
+                                            dark
+                                            fab
+                                            small
+                                            v-on="{...menu }"
+                                    >
+                                        <v-icon>menu</v-icon>
+                                    </v-btn>
+                                </template>
+                                <v-list>
+                                    <v-list-item
+                                            @click="searchDialog = true"
+                                    >
+                                        <v-list-item-title>Search Recipe</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item
+                                            @click="recipeCreatorDialog = true"
+                                    >
+                                        <v-list-item-title>Create Recipe</v-list-item-title>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                        </v-col>
+                    </v-row>
                 </v-col>
             </v-row>
         </v-app-bar>

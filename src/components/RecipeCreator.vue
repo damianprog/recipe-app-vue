@@ -11,7 +11,7 @@
                 >
                     <v-text-field
                             v-model="updatedRecipe.title"
-                            label="Title"
+                            label="Title (Required)"
                     >
                     </v-text-field>
                 </v-col>
@@ -21,7 +21,7 @@
                 >
                     <v-text-field
                             v-model="updatedRecipe.imgUrl"
-                            label="Image Url (Optional)"
+                            label="Image Url"
                     >
                     </v-text-field>
                 </v-col>
@@ -33,7 +33,7 @@
                 >
                     <v-select
                             v-model="updatedRecipe.mealTypes"
-                            label="Meal Type"
+                            label="Meal Type (Required)"
                             :items="mealTypes"
                             multiple
                     >
@@ -112,7 +112,10 @@
 
         computed: {
             enableSave() {
-                return this.updatedRecipe.title && this.updatedRecipe.title.trim() != "";
+                const titlePresent = this.updatedRecipe.title && this.updatedRecipe.title.trim() != "";
+                const mealTypesPresent = this.updatedRecipe.mealTypes && this.updatedRecipe.mealTypes.length > 0;
+
+                return titlePresent && mealTypesPresent;
             }
         },
 

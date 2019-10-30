@@ -3,20 +3,17 @@
             v-model="menu"
             :close-on-content-click="false"
             offset-y
-            min-width="650"
+            absolute
+            min-width="200"
     >
         <template v-slot:activator="{ on }">
-            <v-btn
-                    color="indigo"
-                    dark
-                    v-on="on"
-            >
-                Search Locally
-            </v-btn>
+            <slot :item="{...on}"></slot>
         </template>
-        <v-card>
+        <v-card
+                class="px-5"
+        >
             <v-list>
-                <v-list-item>
+                <v-list-item class="pl-0">
                     <v-list-item-icon>
                         <v-icon>mdi-magnify</v-icon>
                     </v-list-item-icon>
@@ -27,7 +24,6 @@
             </v-list>
             <v-btn
                     color="primary"
-                    class="ml-4"
                     dark
                     @click="resetFilters"
             >
@@ -35,18 +31,18 @@
             </v-btn>
             <v-row>
                 <v-col
-                        cols="12" sm="6"
+                        cols="12"
+                        sm="6"
                 >
                     <v-text-field
                             v-model="title"
                             label="Recipe Name"
-                            class="ml-4"
                             @input="onInput"
                     >
                     </v-text-field>
                 </v-col>
                 <v-col
-                        cols="12" sm="5"
+                        cols="12" sm="6"
                 >
                     <v-select
                             v-model="selectedMealTypes"
@@ -58,6 +54,14 @@
                     </v-select>
                 </v-col>
             </v-row>
+            <v-card-actions class="px-0">
+                <v-spacer></v-spacer>
+                <v-btn
+                        @click="menu = false"
+                        color="primary"
+                >Close
+                </v-btn>
+            </v-card-actions>
         </v-card>
     </v-menu>
 </template>

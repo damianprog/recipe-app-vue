@@ -6,7 +6,7 @@
             <div class="d-flex flex-column flex-grow-1">
                 Search for Recipe
                 <v-row>
-                    <v-col cols="4" class="pb-0">
+                    <v-col cols="7" sm="4" class="pb-0">
                         <v-text-field
                                 class="pa-0"
                                 placeholder="Recipe name"

@@ -220,12 +220,11 @@
             deleteRecipe() {
                 if (confirm("Are you sure you want to delete this recipe?")) {
                     db.collection('recipes').doc(this.updatedRecipe.id).get().then(doc => {
-                        doc.ref.delete();
-                    })
-                        .then(() => {
+                        doc.ref.delete().then(() => {
                             this.editMode = false;
                             this.$emit("delete");
-                        });
+                        })
+                    })
                 }
             },
             imgUrlAlt(event) {
